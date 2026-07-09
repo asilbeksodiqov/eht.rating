@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xodimlar Reyting Portali</title>
+<title>Xodimlar Monitoring Paneli</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -12,47 +12,23 @@
 </head>
 <body>
 
-<!-- Xavfsizlik uchun dinamik suv belgisi (watermark) — script.js orqali to'ldiriladi -->
-<div id="watermarkOverlay" class="watermark-overlay" aria-hidden="true"></div>
-
-<!-- Konfetti effekti uchun konteyner (1-o'rinda bo'lgan xodim login qilganda) -->
-<div id="confettiContainer" class="confetti-container" aria-hidden="true"></div>
-
-<!-- 1-o'rin tabrigi modali -->
-<div id="celebrationModal" class="celebration-modal hidden">
-  <div class="celebration-card">
-    <div class="celebration-icon">🏆</div>
-    <h2>Ajoyib natija!</h2>
-    <p>Siz hozir reytingda <strong>1-o'rindasiz</strong>! Shu ruhda davom eting.</p>
-    <button id="celebrationCloseBtn" class="btn btn-primary">Rahmat!</button>
-  </div>
-</div>
-
-<!-- ===================== LOGIN KARTASI ===================== -->
-<div id="loginScreen" class="login-screen">
-  <form id="loginForm" class="login-card">
-    <div class="login-icon">
+<!-- ===================== PAROL GATE ===================== -->
+<div id="authGate" class="auth-gate">
+  <form id="authForm" class="auth-card">
+    <div class="auth-icon">
       <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7">
         <rect x="4" y="10" width="16" height="10" rx="2"/>
         <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke-linecap="round"/>
       </svg>
     </div>
-    <h1>Xodimlar Portali</h1>
-    <p>Ismingizni tanlang va shaxsiy kodingizni kiriting</p>
-
-    <div class="search-field">
-      <input type="text" id="fishSearchInput" class="login-input" placeholder="Ism familiyangizni yozing..." autocomplete="off">
-      <div id="fishSuggestions" class="suggestions-list hidden"></div>
-    </div>
-
-    <input type="password" id="loginPasswordInput" class="login-input" placeholder="Parol / kod" autocomplete="current-password" disabled>
-    <button type="submit" id="loginSubmitBtn" class="btn btn-primary login-submit" disabled>
+    <h1>Monitoring Paneli</h1>
+    <p>Davom etish uchun parolni kiriting</p>
+    <input type="password" id="authPasswordInput" class="auth-input" placeholder="Parol" autocomplete="current-password">
+    <button type="submit" id="authSubmitBtn" class="btn btn-primary auth-submit">
       <span class="btn-label">Kirish</span>
       <span class="btn-spinner hidden"></span>
     </button>
-    <p id="loginHint" class="login-hint">Avval ro'yxatdan ismingizni tanlang</p>
-    <p id="loginError" class="login-error hidden"></p>
-    <a href="#" id="forgotPasswordLink" class="forgot-link">Parolni unutdingizmi?</a>
+    <p id="authError" class="auth-error hidden"></p>
   </form>
 </div>
 
@@ -61,72 +37,38 @@
 
   <header class="dash-header">
     <div class="dash-header-identity">
-      <div class="avatar-mark" id="avatarInitials">—</div>
+      <div class="avatar-mark">RP</div>
       <div>
-        <h1 id="myNameLabel">—</h1>
-        <p id="myFilialLabel">—</p>
+        <h1>Xodimlar Reyting Monitoringi</h1>
+        <p>Ehtirom Plus &middot; ichki foydalanish uchun</p>
       </div>
-    </div>
-    <div class="dash-header-rank" id="myRankBadge">
-      <span class="rank-badge-value" id="myRankValue">—</span>
-      <span class="rank-badge-label">o'rin</span>
     </div>
     <button id="logoutBtn" class="btn btn-ghost">Chiqish</button>
   </header>
 
   <main class="dash-main">
 
-    <!-- ---------- MENING NATIJAM ---------- -->
-    <section class="panel">
-      <div class="panel-heading">
-        <span class="panel-eyebrow">Shaxsiy</span>
-        <h2>Mening Natijam</h2>
+    <!-- ---------- UMUMIY STATISTIKA ---------- -->
+    <section class="summary-row" id="summaryRow">
+      <div class="summary-card">
+        <span class="summary-label">Jami xodimlar</span>
+        <span class="summary-value" id="summaryTotal">—</span>
       </div>
-
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">Ball<span class="kpi-suffix hidden" id="ballSuffix"></span></span>
-          <span class="kpi-value" id="kpiBall">0</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Savdo soni<span class="kpi-suffix hidden" id="savdoSoniSuffix"></span></span>
-          <span class="kpi-value" id="kpiSavdoSoni">0</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">Savdo plan<span class="kpi-suffix hidden" id="savdoPlanSuffix"></span></span>
-          <span class="kpi-value" id="kpiSavdoPlan">0</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">PAR-31 %<span class="kpi-suffix hidden" id="par31Suffix"></span></span>
-          <span class="kpi-value" id="kpiPar31">0%</span>
-        </div>
+      <div class="summary-card">
+        <span class="summary-label">O'rtacha ball</span>
+        <span class="summary-value" id="summaryAvgBall">—</span>
       </div>
-
-      <div class="medal-row">
-        <div class="medal-badge medal-gold">
-          <span class="medal-count" id="medalRank1">0</span>
-          <span class="medal-label">1-o'rin</span>
-        </div>
-        <div class="medal-badge medal-silver">
-          <span class="medal-count" id="medalRank2">0</span>
-          <span class="medal-label">2-o'rin</span>
-        </div>
-        <div class="medal-badge medal-bronze">
-          <span class="medal-count" id="medalRank3">0</span>
-          <span class="medal-label">3-o'rin</span>
-        </div>
+      <div class="summary-card summary-card-highlight">
+        <span class="summary-label">Yetakchi</span>
+        <span class="summary-value summary-value-name" id="summaryTopName">—</span>
       </div>
     </section>
 
-    <!-- ---------- UMUMIY REYTING ---------- -->
+    <!-- ---------- FILTRLAR ---------- -->
     <section class="panel">
       <div class="panel-heading">
-        <div class="preview-heading-row">
-          <div>
-            <span class="panel-eyebrow">Reyting</span>
-            <h2>Umumiy Reyting</h2>
-          </div>
-        </div>
+        <span class="panel-eyebrow">Reyting</span>
+        <h2>Umumiy Reyting</h2>
       </div>
 
       <div class="date-filter-row">
@@ -138,20 +80,13 @@
         </select>
       </div>
 
-      <div class="view-toggle-row">
-        <button class="view-toggle-chip active" id="listViewBtn">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"/></svg>
-          Ro'yxat
-        </button>
-        <button class="view-toggle-chip" id="chartViewBtn">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M12 19V5M20 19v-7" stroke-linecap="round"/></svg>
-          Diagramma
-        </button>
+      <div class="search-row">
+        <input type="text" id="tableSearchInput" class="date-input search-input" placeholder="Xodim ismini qidirish...">
       </div>
 
       <div id="leaderboardStatus" class="status-box hidden"></div>
 
-      <div class="table-scroll" id="listView">
+      <div class="table-scroll">
         <table class="data-table">
           <thead>
             <tr>
@@ -159,25 +94,36 @@
               <th>FISH</th>
               <th>Filial</th>
               <th class="col-score" id="ballColumnHeader">Ball</th>
+              <th class="col-score" id="savdoSoniColumnHeader">Savdo soni</th>
+              <th class="col-score" id="savdoPlanColumnHeader">Savdo Plan %</th>
+              <th class="col-score" id="par31ColumnHeader">PAR-31 %</th>
             </tr>
           </thead>
           <tbody id="leaderboardBody"></tbody>
         </table>
-      </div>
-
-      <div class="chart-view hidden" id="chartView">
-        <div id="chartEmptyState" class="chart-empty hidden">
-          Diagramma faqat "Oy" yoki "Hammasi" tanlanganda ko'rsatiladi.
-        </div>
-        <div id="chartSvgWrapper" class="chart-svg-wrapper"></div>
       </div>
     </section>
 
   </main>
 
   <footer class="dash-footer">
-    <p>Ehtirom Plus &middot; Xodimlar reyting portali</p>
+    <p>Ehtirom Plus &middot; by Sodiqov</p>
   </footer>
+</div>
+
+<!-- ===================== XODIM DIAGRAMMASI MODALI ===================== -->
+<div id="employeeChartModal" class="chart-modal hidden">
+  <div class="chart-modal-card">
+    <div class="chart-modal-header">
+      <div>
+        <h2 id="chartModalName">—</h2>
+        <p id="chartModalFilial">—</p>
+      </div>
+      <button id="chartModalCloseBtn" class="btn-icon" title="Yopish">&times;</button>
+    </div>
+    <div id="chartModalEmpty" class="chart-empty hidden">Diagramma faqat "Oy" yoki "Hammasi" filtri tanlanganda ko'rsatiladi.</div>
+    <div id="chartModalSvgWrapper" class="chart-svg-wrapper"></div>
+  </div>
 </div>
 
 <script src="script.js"></script>
